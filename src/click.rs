@@ -4,6 +4,7 @@ use clickhouse::{Client, Row};
 use serde::de::DeserializeOwned;
 use std::env;
 
+const CLICKHOUSE_TABLE_NAME: &str = "account_transfers";
 pub const MAX_TIMESTAMP: u64 = (u32::MAX / 2) as u64 * 10u64.pow(9);
 
 #[derive(Clone)]
@@ -81,9 +82,9 @@ impl ClickDB {
                 SELECT
                     *
                 FROM
-                    transfers
+                    {CLICKHOUSE_TABLE_NAME}
                 WHERE
-                    (sender_id = ? OR receiver_id = ?)
+                    account_id = ?
                     AND block_timestamp >= ?
                     AND block_timestamp < ?
                     {resume_clause}
@@ -95,7 +96,6 @@ impl ClickDB {
         );
         self.client
             .query(&query)
-            .bind(&account_id)
             .bind(&account_id)
             .bind(from_timestamp)
             .bind(to_timestamp)

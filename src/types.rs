@@ -16,23 +16,19 @@ pub struct TransferRow {
     pub transfer_index: u32,
     pub signer_id: String,
     pub predecessor_id: String,
+    pub receipt_account_id: String,
     pub account_id: String,
-    pub sender_id: Option<String>,
-    pub receiver_id: Option<String>,
+    pub other_account_id: Option<String>,
     pub asset_id: String,
     pub asset_type: String,
     #[serde_as(serialize_as = "DisplayFromStr", deserialize_as = "_")]
-    pub amount: u128,
+    pub amount: i128,
     pub method_name: Option<String>,
     pub transfer_type: String,
     pub human_amount: Option<f64>,
     pub usd_amount: Option<f64>,
     #[serde_as(serialize_as = "Option<DisplayFromStr>", deserialize_as = "_")]
-    pub sender_start_of_block_balance: Option<u128>,
+    pub start_of_block_balance: Option<u128>,
     #[serde_as(serialize_as = "Option<DisplayFromStr>", deserialize_as = "_")]
-    pub sender_end_of_block_balance: Option<u128>,
-    #[serde_as(serialize_as = "Option<DisplayFromStr>", deserialize_as = "_")]
-    pub receiver_start_of_block_balance: Option<u128>,
-    #[serde_as(serialize_as = "Option<DisplayFromStr>", deserialize_as = "_")]
-    pub receiver_end_of_block_balance: Option<u128>,
+    pub end_of_block_balance: Option<u128>,
 }
