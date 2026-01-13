@@ -1,7 +1,79 @@
-## Example queries
+## Transfers API
+
+### Endpoint
+
+```
+POST https://transfers.main.fastnear.com/v0/transfers
+```
+
+### Parameters
+
+| Parameter           | Type    | Required | Default | Description                               |
+|---------------------|---------|----------|---------|-------------------------------------------|
+| `account_id`        | string  | ✅        | -       | NEAR account ID to query                  |
+| `resume_token`      | string  | ❌        | null    | Pagination token from previous response   |
+| `from_timestamp_ms` | integer | ❌        | null    | Start of time range (ms) inclusive        |
+| `to_timestamp_ms`   | integer | ❌        | null    | End of time range (ms)                    |
+| `limit`             | integer | ❌        | 1000    | Number of transfers to return (1 to 1000) |
+| `desc`              | boolean | ❌        | false   | Sort descending (newest first) when true  |
+
+### Examples
+
+#### Basic Query
+
+Fetch transfers for an account with default settings (ascending order):
 
 ```bash
-http post http://localhost:3000/v0/transfers account_id="intents.near" limit:=10 desc:=true
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near"}'
+```
+
+#### With Limit and Descending Order
+
+Fetch the 10 most recent transfers:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "limit": 10, "desc": true}'
+```
+
+#### Pagination with Resume Token
+
+Continue fetching from where the previous request left off:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "limit": 10, "desc": true, "resume_token": "7594641293647473196415950063"}'
+```
+
+#### Filter by Time Range
+
+Fetch transfers within a specific time window (timestamps in milliseconds):
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "from_timestamp_ms": 1768265220000, "to_timestamp_ms": 1768265226000}'
+```
+
+#### Combined: Resume Token with Time Filter
+
+Paginate through transfers within a time range:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "intents.near",
+    "resume_token": "7594641293647473196415950063",
+    "from_timestamp_ms": 1768265200000,
+    "to_timestamp_ms": 1768265300000,
+    "limit": 5,
+    "desc": true
+  }'
 ```
 
 ## Reference Schema
