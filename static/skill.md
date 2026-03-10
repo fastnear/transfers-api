@@ -18,7 +18,13 @@ Content-Type: application/json
   "from_timestamp_ms": null,
   "to_timestamp_ms": null,
   "limit": 100,
-  "desc": false
+  "desc": false,
+  "min_amount": null,
+  "min_human_amount": null,
+  "min_usd_amount": null,
+  "asset_id": null,
+  "direction": null,
+  "ignore_system": false
 }
 ```
 
@@ -30,6 +36,12 @@ Content-Type: application/json
 | `to_timestamp_ms` | integer | no | null | End of time range (milliseconds) |
 | `limit` | integer | no | 100 | Results per page (1–100) |
 | `desc` | boolean | no | false | `true` for newest-first, `false` for oldest-first |
+| `min_amount` | string | no | null | Minimum absolute amount in token units (e.g. yoctoNEAR) |
+| `min_human_amount` | number | no | null | Minimum absolute amount after applying token decimals |
+| `min_usd_amount` | number | no | null | Minimum absolute USD value |
+| `asset_id` | string | no | null | Filter by asset ID (e.g. `"near"` or a token contract ID) |
+| `direction` | string | no | null | `"sender"` for outgoing, `"receiver"` for incoming |
+| `ignore_system` | boolean | no | false | Skip transfers where `other_account_id` is `"system"` |
 
 ## Response
 
@@ -94,6 +106,22 @@ Get transfers in a time window:
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{"account_id": "intents.near", "from_timestamp_ms": 1768265220000, "to_timestamp_ms": 1768265226000}'
+```
+
+Filter by asset, direction, and minimum amount:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "asset_id": "near", "direction": "receiver", "min_amount": "1000000000000000000000000", "limit": 10, "desc": true}'
+```
+
+Filter by USD value, ignoring system transfers:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "min_usd_amount": 100, "ignore_system": true, "desc": true}'
 ```
 
 ## Error Responses

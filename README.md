@@ -10,12 +10,18 @@ POST https://transfers.main.fastnear.com/v0/transfers
 
 | Parameter           | Type    | Required | Default | Description                               |
 |---------------------|---------|----------|---------|-------------------------------------------|
-| `account_id`        | string  | ✅        | -       | NEAR account ID to query                  |
-| `resume_token`      | string  | ❌        | null    | Pagination token from previous response   |
-| `from_timestamp_ms` | integer | ❌        | null    | Start of time range (ms) inclusive        |
-| `to_timestamp_ms`   | integer | ❌        | null    | End of time range (ms)                    |
-| `limit`             | integer | ❌        | 1000    | Number of transfers to return (1 to 1000) |
-| `desc`              | boolean | ❌        | false   | Sort descending (newest first) when true  |
+| `account_id`        | string  | ✅        | -       | NEAR account ID to query                                                  |
+| `resume_token`      | string  | ❌        | null    | Pagination token from previous response                                   |
+| `from_timestamp_ms` | integer | ❌        | null    | Start of time range (ms) inclusive                                        |
+| `to_timestamp_ms`   | integer | ❌        | null    | End of time range (ms)                                                    |
+| `limit`             | integer | ❌        | 1000    | Number of transfers to return (1 to 1000)                                 |
+| `desc`              | boolean | ❌        | false   | Sort descending (newest first) when true                                  |
+| `min_amount`        | string  | ❌        | null    | Minimum absolute amount in token units (e.g. yoctoNEAR)                   |
+| `min_human_amount`  | number  | ❌        | null    | Minimum absolute amount after applying token decimals                     |
+| `min_usd_amount`    | number  | ❌        | null    | Minimum absolute USD value                                                |
+| `asset_id`          | string  | ❌        | null    | Filter by asset ID (e.g. `"near"` or a token contract ID)                |
+| `direction`         | string  | ❌        | null    | Filter by direction: `"sender"` (outgoing) or `"receiver"` (incoming)    |
+| `ignore_system`     | boolean | ❌        | false   | Skip transfers where `other_account_id` is `"system"`                    |
 
 ### Examples
 
@@ -72,6 +78,38 @@ curl -X POST https://transfers.main.fastnear.com/v0/transfers \
     "from_timestamp_ms": 1768265200000,
     "to_timestamp_ms": 1768265300000,
     "limit": 5,
+    "desc": true
+  }'
+```
+
+#### Filter by Asset and Direction
+
+Fetch only incoming NEAR transfers with at least 1 NEAR (≥ 10²⁴ yoctoNEAR):
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "intents.near",
+    "asset_id": "near",
+    "direction": "receiver",
+    "min_amount": "1000000000000000000000000",
+    "limit": 10,
+    "desc": true
+  }'
+```
+
+#### Filter by USD Value, Ignoring System Transfers
+
+Fetch transfers worth at least $100, excluding system transfers:
+
+```bash
+curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "intents.near",
+    "min_usd_amount": 100,
+    "ignore_system": true,
     "desc": true
   }'
 ```
