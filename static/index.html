@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transfers API</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --code-bg: #1c2128;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    h3 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+    p { margin-bottom: 0.8rem; }
+    .endpoint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.95rem;
+    }
+    .method { color: var(--green); font-weight: 700; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--border);
+    }
+    th { background: var(--surface); color: var(--text-muted); font-weight: 600; }
+    td { background: var(--bg); }
+    td code {
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .required { color: var(--green); }
+    .optional { color: var(--text-muted); }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      margin: 0.8rem 0 1.5rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    .schema-section { margin-top: 2rem; }
+    .comment { color: var(--text-muted); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Transfers API</h1>
+
+  <h2>Endpoint</h2>
+  <div class="endpoint">
+    <span class="method">POST</span> https://transfers.main.fastnear.com/v0/transfers
+  </div>
+
+  <h2>Parameters</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Type</th>
+        <th>Required</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>account_id</code></td>
+        <td>string</td>
+        <td class="required">Yes</td>
+        <td>&mdash;</td>
+        <td>NEAR account ID to query</td>
+      </tr>
+      <tr>
+        <td><code>resume_token</code></td>
+        <td>string</td>
+        <td class="optional">No</td>
+        <td>null</td>
+        <td>Pagination token from previous response</td>
+      </tr>
+      <tr>
+        <td><code>from_timestamp_ms</code></td>
+        <td>integer</td>
+        <td class="optional">No</td>
+        <td>null</td>
+        <td>Start of time range (ms) inclusive</td>
+      </tr>
+      <tr>
+        <td><code>to_timestamp_ms</code></td>
+        <td>integer</td>
+        <td class="optional">No</td>
+        <td>null</td>
+        <td>End of time range (ms)</td>
+      </tr>
+      <tr>
+        <td><code>limit</code></td>
+        <td>integer</td>
+        <td class="optional">No</td>
+        <td>1000</td>
+        <td>Number of transfers to return (1 to 1000)</td>
+      </tr>
+      <tr>
+        <td><code>desc</code></td>
+        <td>boolean</td>
+        <td class="optional">No</td>
+        <td>false</td>
+        <td>Sort descending (newest first) when true</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Examples</h2>
+
+  <h3>Basic Query</h3>
+  <p>Fetch transfers for an account with default settings (ascending order):</p>
+  <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near"}'</code></pre>
+
+  <h3>With Limit and Descending Order</h3>
+  <p>Fetch the 10 most recent transfers:</p>
+  <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "limit": 10, "desc": true}'</code></pre>
+
+  <h3>Pagination with Resume Token</h3>
+  <p>Continue fetching from where the previous request left off:</p>
+  <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "limit": 10, "desc": true, "resume_token": "7594641293647473196415950063"}'</code></pre>
+
+  <h3>Filter by Time Range</h3>
+  <p>Fetch transfers within a specific time window (timestamps in milliseconds):</p>
+  <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{"account_id": "intents.near", "from_timestamp_ms": 1768265220000, "to_timestamp_ms": 1768265226000}'</code></pre>
+
+  <h3>Combined: Resume Token with Time Filter</h3>
+  <p>Paginate through transfers within a time range:</p>
+  <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_id": "intents.near",
+    "resume_token": "7594641293647473196415950063",
+    "from_timestamp_ms": 1768265200000,
+    "to_timestamp_ms": 1768265300000,
+    "limit": 5,
+    "desc": true
+  }'</code></pre>
+
+  <h2>Reference Schema</h2>
+  <p>Account-centric Transfers table:</p>
+  <pre><code>CREATE TABLE account_transfers
+(
+    block_height           UInt64       <span class="comment">-- Block height</span>
+    block_timestamp        DateTime64   <span class="comment">-- Block timestamp in nanoseconds (UTC)</span>
+    transaction_id         String?      <span class="comment">-- Transaction hash</span>
+    receipt_id             String       <span class="comment">-- Receipt hash</span>
+    action_index           UInt16?      <span class="comment">-- Index of the action within the receipt</span>
+    log_index              UInt16?      <span class="comment">-- Index of the log within the receipt</span>
+    transfer_index         UInt32       <span class="comment">-- Unique index of the transfer within the block</span>
+    signer_id              String       <span class="comment">-- Transaction signer account ID</span>
+    predecessor_id         String       <span class="comment">-- Receipt predecessor account ID</span>
+    receipt_account_id     String       <span class="comment">-- Account ID where the receipt is executed</span>
+    account_id             String       <span class="comment">-- Account ID involved in the transfer</span>
+    other_account_id       String?      <span class="comment">-- Other side of the transfer (empty for mints/burns)</span>
+    asset_id               String       <span class="comment">-- Asset ID ("near" or token contract account ID)</span>
+    asset_type             String       <span class="comment">-- "Near" or "Ft"</span>
+    amount                 Int128       <span class="comment">-- Amount in token units (positive=in, negative=out)</span>
+    method_name            String?      <span class="comment">-- Method that triggered the transfer</span>
+    transfer_type          String       <span class="comment">-- NEAR native token or Fungible Token (FT)</span>
+    human_amount           Float64?     <span class="comment">-- Amount after applying token decimals</span>
+    usd_amount             Float64?     <span class="comment">-- USD value at the time of the block</span>
+    start_of_block_balance UInt128?     <span class="comment">-- Sender balance at start of block</span>
+    end_of_block_balance   UInt128?     <span class="comment">-- Sender balance at end of block</span>
+)
+PRIMARY KEY (account_id, block_timestamp)
+ORDER BY (account_id, block_timestamp, transfer_index)</code></pre>
+
+</body>
+</html>

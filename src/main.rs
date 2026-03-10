@@ -25,7 +25,13 @@ pub struct AppState {
 async fn greet() -> impl Responder {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body("It's FAST transfers!")
+        .body(include_str!("../static/index.html"))
+}
+
+async fn skill() -> impl Responder {
+    HttpResponse::Ok()
+        .content_type("text/markdown; charset=utf-8")
+        .body(include_str!("../static/skill.md"))
 }
 
 #[actix_web::main]
@@ -79,6 +85,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(tracing_actix_web::TracingLogger::default())
             .service(api_v0)
             .route("/", web::get().to(greet))
+            .route("/skill.md", web::get().to(skill))
     })
     .bind(bind_address)?
     .run()
