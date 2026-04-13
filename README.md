@@ -1,5 +1,23 @@
 ## Transfers API
 
+This service now owns its aggregate OpenAPI source in-repo. The checked-in
+`openapi/openapi.yaml` file is generated from the Rust DTOs and a Rust-first operation registry:
+
+`Rust DTOs -> cargo run --features openapi --bin generate-openapi -> openapi/openapi.yaml -> mike-docs split + sync -> builder-docs direct docs runtime`
+
+Generated files in `openapi/` are not hand-edit targets. This repo no longer owns per-operation
+leaf YAML files or portal presets.
+
+### OpenAPI Generation
+
+```bash
+# Regenerate the checked-in aggregate OpenAPI file
+cargo run --features openapi --bin generate-openapi
+
+# Verify the checked-in file is current
+cargo run --features openapi --bin generate-openapi -- --check
+```
+
 ### Endpoint
 
 ```
@@ -14,7 +32,7 @@ POST https://transfers.main.fastnear.com/v0/transfers
 | `resume_token`      | string  | ❌        | null    | Pagination token from previous response                                   |
 | `from_timestamp_ms` | integer | ❌        | null    | Start of time range (ms) inclusive                                        |
 | `to_timestamp_ms`   | integer | ❌        | null    | End of time range (ms)                                                    |
-| `limit`             | integer | ❌        | 1000    | Number of transfers to return (1 to 1000)                                 |
+| `limit`             | integer | ❌        | 100     | Number of transfers to return (1 to 100)                                  |
 | `desc`              | boolean | ❌        | false   | Sort descending (newest first) when true                                  |
 | `min_amount`        | string  | ❌        | null    | Minimum absolute amount in token units (e.g. yoctoNEAR)                   |
 | `min_human_amount`  | number  | ❌        | null    | Minimum absolute amount after applying token decimals                     |
