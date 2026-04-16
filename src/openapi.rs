@@ -36,7 +36,7 @@ pub fn generate(check: bool) -> Result<()> {
             method: HttpMethod::Post,
             operation_id: "get_transfers_by_account",
             summary: "Query transfers for an account",
-            description: "Returns transfer rows plus an opaque resume token for pagination.",
+            description: "Fetch transfer rows for one account with optional direction, asset, amount, and time filters.",
             tags: &["transfers"],
             parameters: vec![],
             request_body: Some(RequestBodySpec::Json {

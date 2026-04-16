@@ -167,7 +167,7 @@ openapi: 3.0.3
 paths:
   /v0/transfers:
     post:
-      description: Returns transfer rows plus an opaque resume token for pagination.
+      description: Fetch transfer rows for one account with optional direction, asset, amount, and time filters.
       operationId: get_transfers_by_account
       requestBody:
         content:
