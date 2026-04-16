@@ -177,7 +177,7 @@ paths:
                 summary: Recent incoming NEAR transfers
                 value:
                   account_id: intents.near
-                  asset_id: near
+                  asset_id: native:near
                   desc: true
                   direction: receiver
                   limit: 10
@@ -195,7 +195,7 @@ paths:
                 - account_id: intents.near
                   action_index: 0
                   amount: '-1000000000000000000000000'
-                  asset_id: near
+                  asset_id: native:near
                   asset_type: Near
                   block_height: '176826522'
                   block_timestamp: '1768265226000'

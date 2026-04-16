@@ -48,7 +48,7 @@ pub fn generate(check: bool) -> Result<()> {
                     summary: Some("Recent incoming NEAR transfers"),
                     value: json!({
                         "account_id": "intents.near",
-                        "asset_id": "near",
+                        "asset_id": "native:near",
                         "direction": "receiver",
                         "min_amount": "1000000000000000000000000",
                         "limit": 10,
@@ -77,7 +77,7 @@ pub fn generate(check: bool) -> Result<()> {
                                     "receipt_account_id": "wrap.near",
                                     "account_id": "intents.near",
                                     "other_account_id": "ref-finance.near",
-                                    "asset_id": "near",
+                                    "asset_id": "native:near",
                                     "asset_type": "Near",
                                     "amount": "-1000000000000000000000000",
                                     "method_name": "ft_transfer_call",
