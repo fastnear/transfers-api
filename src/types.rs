@@ -16,29 +16,41 @@ pub enum Direction {
 #[cfg_attr(feature = "openapi", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "openapi", schemars(deny_unknown_fields))]
 pub struct TransfersInput {
+    /// NEAR account to query transfers for (the signer or receiver, depending on `direction`).
     #[cfg_attr(feature = "openapi", schemars(with = "String"))]
     pub account_id: AccountId,
+    /// Opaque pagination token returned as `resume_token` on a prior page; omit for the first page.
     #[serde_as(as = "Option<DisplayFromStr>")]
     #[cfg_attr(feature = "openapi", schemars(with = "Option<String>"))]
     pub resume_token: Option<u128>,
+    /// Inclusive lower bound on block timestamp in milliseconds since the Unix epoch.
     #[cfg_attr(feature = "openapi", schemars(range(min = 0)))]
     pub from_timestamp_ms: Option<u64>,
+    /// Exclusive upper bound on block timestamp in milliseconds since the Unix epoch.
     #[cfg_attr(feature = "openapi", schemars(range(min = 0)))]
     pub to_timestamp_ms: Option<u64>,
+    /// Maximum number of transfer rows to return in one page (1–100).
     #[cfg_attr(feature = "openapi", schemars(range(min = 1, max = 100)))]
     pub limit: Option<usize>,
+    /// When true, sort newest-first; when false or omitted, sort oldest-first.
     pub desc: Option<bool>,
+    /// Minimum absolute transfer amount in the asset's base units (e.g. yoctoNEAR), stringified u128.
     #[serde_as(as = "Option<DisplayFromStr>")]
     #[cfg_attr(feature = "openapi", schemars(with = "Option<String>"))]
     pub min_amount: Option<u128>,
+    /// Minimum transfer amount in human-readable units (decimals already applied).
     pub min_human_amount: Option<f64>,
+    /// Minimum transfer amount in USD-equivalent at time of transfer.
     pub min_usd_amount: Option<f64>,
+    /// Asset identifier such as `native:near` for NEAR or `<contract_id>` for fungible tokens.
     pub asset_id: Option<String>,
+    /// Restrict to transfers where the account acts as `sender` or `receiver`; omit for both sides.
     #[cfg_attr(
         feature = "openapi",
         schemars(schema_with = "nullable_direction_schema")
     )]
     pub direction: Option<Direction>,
+    /// When true, hide system transfers (validator rewards, implicit account creation, refunds).
     pub ignore_system: Option<bool>,
 }
 

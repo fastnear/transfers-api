@@ -93,28 +93,35 @@ components:
       additionalProperties: false
       properties:
         account_id:
+          description: NEAR account to query transfers for (the signer or receiver, depending on `direction`).
           type: string
         asset_id:
+          description: Asset identifier such as `native:near` for NEAR or `<contract_id>` for fungible tokens.
           nullable: true
           type: string
         desc:
+          description: When true, sort newest-first; when false or omitted, sort oldest-first.
           nullable: true
           type: boolean
         direction:
+          description: Restrict to transfers where the account acts as `sender` or `receiver`; omit for both sides.
           enum:
           - sender
           - receiver
           nullable: true
           type: string
         from_timestamp_ms:
+          description: Inclusive lower bound on block timestamp in milliseconds since the Unix epoch.
           format: uint64
           minimum: 0
           nullable: true
           type: integer
         ignore_system:
+          description: When true, hide system transfers (validator rewards, implicit account creation, refunds).
           nullable: true
           type: boolean
         limit:
+          description: Maximum number of transfer rows to return in one page (1–100).
           format: uint
           maximum: 100
           minimum: 1
@@ -122,21 +129,26 @@ components:
           type: integer
         min_amount:
           default: null
+          description: Minimum absolute transfer amount in the asset's base units (e.g. yoctoNEAR), stringified u128.
           nullable: true
           type: string
         min_human_amount:
+          description: Minimum transfer amount in human-readable units (decimals already applied).
           format: double
           nullable: true
           type: number
         min_usd_amount:
+          description: Minimum transfer amount in USD-equivalent at time of transfer.
           format: double
           nullable: true
           type: number
         resume_token:
           default: null
+          description: Opaque pagination token returned as `resume_token` on a prior page; omit for the first page.
           nullable: true
           type: string
         to_timestamp_ms:
+          description: Exclusive upper bound on block timestamp in milliseconds since the Unix epoch.
           format: uint64
           minimum: 0
           nullable: true
