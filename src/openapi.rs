@@ -1,7 +1,7 @@
 use anyhow::Result;
 use fastnear_openapi_generator::{
-    build_service_doc, write_or_check_yaml, AggregateOperationSpec, ApiInfo, ApiServer,
-    HttpMethod, NamedExample, RequestBodySpec, ResponseContent, ResponseSpec, SchemaRegistry,
+    build_service_doc, write_or_check_yaml, AggregateOperationSpec, ApiInfo, ApiServer, HttpMethod,
+    NamedExample, RequestBodySpec, ResponseContent, ResponseSpec, SchemaRegistry,
 };
 use serde_json::json;
 

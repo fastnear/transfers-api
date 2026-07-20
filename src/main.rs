@@ -5,7 +5,7 @@ use actix_cors::Cors;
 use actix_web::http::header;
 use actix_web::{middleware, web, App, HttpServer};
 use tracing_subscriber::EnvFilter;
-use transfers_api::{api_v0_scope, click::ClickDB, greet, skill, AppState};
+use transfers_api::{api, click::ClickDB, greet, skill, AppState};
 
 const PROJECT_ID: &str = "server";
 
@@ -47,6 +47,7 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600)
             .supports_credentials();
 
+        let api_v0 = web::scope("/v0").service(api::v0::get_transfers_by_account);
         App::new()
             .app_data(web::Data::new(AppState {
                 // redis_client: redis_client.clone(),
@@ -57,7 +58,7 @@ async fn main() -> std::io::Result<()> {
                 "%{r}a \"%r\"	%s %b \"%{Referer}i\" \"%{User-Agent}i\" %T",
             ))
             .wrap(tracing_actix_web::TracingLogger::default())
-            .service(api_v0_scope())
+            .service(api_v0)
             .route("/", web::get().to(greet))
             .route("/skill.md", web::get().to(skill))
     })
