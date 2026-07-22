@@ -1,38 +1,13 @@
-mod api;
-mod cache;
-mod click;
-mod types;
-
 use dotenv::dotenv;
 use std::env;
 
-use crate::click::ClickDB;
-use crate::types::*;
 use actix_cors::Cors;
 use actix_web::http::header;
-use actix_web::{middleware, web, App, HttpResponse, HttpServer, Responder};
-use near_primitives::types::{AccountId, BlockHeight};
+use actix_web::{middleware, web, App, HttpServer};
 use tracing_subscriber::EnvFilter;
+use transfers_api::{api, click::ClickDB, greet, skill, AppState};
 
 const PROJECT_ID: &str = "server";
-
-#[derive(Clone)]
-pub struct AppState {
-    // pub redis_client: redis::Client,
-    pub click_db: ClickDB,
-}
-
-async fn greet() -> impl Responder {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../static/index.html"))
-}
-
-async fn skill() -> impl Responder {
-    HttpResponse::Ok()
-        .content_type("text/markdown; charset=utf-8")
-        .body(include_str!("../static/skill.md"))
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

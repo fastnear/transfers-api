@@ -1,0 +1,250 @@
+components:
+  schemas:
+    ApiError:
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    TransferRow:
+      additionalProperties: false
+      properties:
+        account_id:
+          type: string
+        action_index:
+          format: uint16
+          maximum: 65535
+          minimum: 0
+          nullable: true
+          type: integer
+        amount:
+          type: string
+        asset_id:
+          type: string
+        asset_type:
+          type: string
+        block_height:
+          type: string
+        block_timestamp:
+          type: string
+        end_of_block_balance:
+          nullable: true
+          type: string
+        human_amount:
+          format: double
+          nullable: true
+          type: number
+        log_index:
+          format: uint16
+          maximum: 65535
+          minimum: 0
+          nullable: true
+          type: integer
+        method_name:
+          nullable: true
+          type: string
+        other_account_id:
+          nullable: true
+          type: string
+        predecessor_id:
+          type: string
+        receipt_account_id:
+          type: string
+        receipt_id:
+          type: string
+        signer_id:
+          type: string
+        start_of_block_balance:
+          nullable: true
+          type: string
+        transaction_id:
+          nullable: true
+          type: string
+        transfer_index:
+          format: uint32
+          minimum: 0
+          type: integer
+        transfer_type:
+          type: string
+        usd_amount:
+          format: double
+          nullable: true
+          type: number
+      required:
+      - block_height
+      - block_timestamp
+      - receipt_id
+      - transfer_index
+      - signer_id
+      - predecessor_id
+      - receipt_account_id
+      - account_id
+      - asset_id
+      - asset_type
+      - amount
+      - transfer_type
+      type: object
+    TransfersInput:
+      additionalProperties: false
+      properties:
+        account_id:
+          description: NEAR account to query transfers for (the signer or receiver, depending on `direction`).
+          type: string
+        asset_id:
+          description: Asset identifier such as `native:near` for NEAR or `<contract_id>` for fungible tokens.
+          nullable: true
+          type: string
+        desc:
+          description: When true, sort newest-first; when false or omitted, sort oldest-first.
+          nullable: true
+          type: boolean
+        direction:
+          description: Restrict to transfers where the account acts as `sender` or `receiver`; omit for both sides.
+          enum:
+          - sender
+          - receiver
+          nullable: true
+          type: string
+        from_timestamp_ms:
+          description: Inclusive lower bound on block timestamp in milliseconds since the Unix epoch.
+          format: uint64
+          minimum: 0
+          nullable: true
+          type: integer
+        ignore_system:
+          description: When true, hide system transfers (validator rewards, implicit account creation, refunds).
+          nullable: true
+          type: boolean
+        limit:
+          description: Maximum number of transfer rows to return in one page (1–100).
+          format: uint
+          maximum: 100
+          minimum: 1
+          nullable: true
+          type: integer
+        min_amount:
+          default: null
+          description: Minimum absolute transfer amount in the asset's base units (e.g. yoctoNEAR), stringified u128.
+          nullable: true
+          type: string
+        min_human_amount:
+          description: Minimum transfer amount in human-readable units (decimals already applied).
+          format: double
+          nullable: true
+          type: number
+        min_usd_amount:
+          description: Minimum transfer amount in USD-equivalent at time of transfer.
+          format: double
+          nullable: true
+          type: number
+        resume_token:
+          default: null
+          description: Opaque pagination token returned as `resume_token` on a prior page; omit for the first page.
+          nullable: true
+          type: string
+        to_timestamp_ms:
+          description: Exclusive upper bound on block timestamp in milliseconds since the Unix epoch.
+          format: uint64
+          minimum: 0
+          nullable: true
+          type: integer
+      required:
+      - account_id
+      - direction
+      type: object
+    TransfersResponse:
+      additionalProperties: false
+      properties:
+        resume_token:
+          nullable: true
+          type: string
+        transfers:
+          items:
+            $ref: '#/components/schemas/TransferRow'
+          type: array
+      required:
+      - transfers
+      - resume_token
+      type: object
+info:
+  description: Account-centric transfer queries for native NEAR and fungible tokens.
+  title: Transfers API
+  version: 3.0.3
+openapi: 3.0.3
+paths:
+  /v0/transfers:
+    post:
+      description: Fetch transfer rows for one account with optional direction, asset, amount, and time filters.
+      operationId: get_transfers_by_account
+      requestBody:
+        content:
+          application/json:
+            examples:
+              recent_near_transfers:
+                summary: Recent incoming NEAR transfers
+                value:
+                  account_id: intents.near
+                  asset_id: native:near
+                  desc: true
+                  direction: receiver
+                  limit: 10
+                  min_amount: '1000000000000000000000000'
+            schema:
+              $ref: '#/components/schemas/TransfersInput'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              example:
+                resume_token: '7594641293647473196415950063'
+                transfers:
+                - account_id: intents.near
+                  action_index: 0
+                  amount: '-1000000000000000000000000'
+                  asset_id: native:near
+                  asset_type: Near
+                  block_height: '176826522'
+                  block_timestamp: '1768265226000'
+                  end_of_block_balance: '3190000000000000000000000'
+                  human_amount: 1
+                  log_index: null
+                  method_name: ft_transfer_call
+                  other_account_id: ref-finance.near
+                  predecessor_id: intents.near
+                  receipt_account_id: wrap.near
+                  receipt_id: 2T8mJ5vL8PkYc3Rm6bNZBvA7k8mHh3oJmM4t9g8vP3Qc
+                  signer_id: intents.near
+                  start_of_block_balance: '4200000000000000000000000'
+                  transaction_id: 9Qz1h7qTjYb6w3VpsL4Qu9Q2qY7Lf8S3Hy4J6WZ7fUPJ
+                  transfer_index: 4
+                  transfer_type: Near
+                  usd_amount: 5.24
+              schema:
+                $ref: '#/components/schemas/TransfersResponse'
+          description: Transfer rows for the requested account
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+          description: Invalid request body
+        '500':
+          content:
+            application/json:
+              schema:
+                type: string
+          description: ClickHouse query failure
+      summary: Query transfers for an account
+      tags:
+      - transfers
+      x-fastnear-slug: transfers
+      x-fastnear-title: Transfers API - Query Transfers
+servers:
+- description: Mainnet
+  url: https://transfers.main.fastnear.com

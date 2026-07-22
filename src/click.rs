@@ -1,8 +1,9 @@
-use crate::*;
-
 use clickhouse::{Client, Row};
+use near_primitives::types::{AccountId, BlockHeight};
 use serde::de::DeserializeOwned;
 use std::env;
+
+use crate::types::{Direction, TransferRow};
 
 const CLICKHOUSE_TABLE_NAME: &str = "account_transfers";
 pub const MAX_TIMESTAMP: u64 = (u32::MAX / 2) as u64 * 10u64.pow(9);
@@ -53,7 +54,7 @@ impl ClickDB {
         min_human_amount: Option<f64>,
         min_usd_amount: Option<f64>,
         asset_id: Option<String>,
-        direction: Option<crate::api::v0::Direction>,
+        direction: Option<Direction>,
         ignore_system: bool,
     ) -> clickhouse::error::Result<Vec<TransferRow>> {
         let from_timestamp = from_timestamp_ms
@@ -100,8 +101,8 @@ impl ClickDB {
             "".to_string()
         };
         let direction_clause = match direction {
-            Some(crate::api::v0::Direction::Sender) => "AND amount < 0".to_string(),
-            Some(crate::api::v0::Direction::Receiver) => "AND amount > 0".to_string(),
+            Some(Direction::Sender) => "AND amount < 0".to_string(),
+            Some(Direction::Receiver) => "AND amount > 0".to_string(),
             None => "".to_string(),
         };
         let ignore_system_clause = if ignore_system {
