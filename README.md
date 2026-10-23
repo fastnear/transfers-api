@@ -1,10 +1,30 @@
 ## Transfers API
 
+This service now owns its aggregate OpenAPI source in-repo. The checked-in
+`openapi/openapi.yaml` file is generated from the Rust DTOs and a Rust-first operation registry:
+
+`Rust DTOs -> cargo run --features openapi --bin generate-openapi -> openapi/openapi.yaml -> mike-docs split + sync -> builder-docs direct docs runtime`
+
+Generated files in `openapi/` are not hand-edit targets. This repo no longer owns per-operation
+leaf YAML files or portal presets.
+
+### OpenAPI Generation
+
+```bash
+# Regenerate the checked-in aggregate OpenAPI file
+cargo run --features openapi --bin generate-openapi
+
+# Verify the checked-in file is current
+cargo run --features openapi --bin generate-openapi -- --check
+```
+
 ### Endpoint
 
 ```
 POST https://transfers.main.fastnear.com/v0/transfers
 ```
+
+The public Transfers API currently runs on mainnet only.
 
 ### Parameters
 
@@ -14,7 +34,7 @@ POST https://transfers.main.fastnear.com/v0/transfers
 | `resume_token`      | string  | ❌        | null    | Pagination token from previous response                                   |
 | `from_timestamp_ms` | integer | ❌        | null    | Start of time range (ms) inclusive                                        |
 | `to_timestamp_ms`   | integer | ❌        | null    | End of time range (ms)                                                    |
-| `limit`             | integer | ❌        | 1000    | Number of transfers to return (1 to 1000)                                 |
+| `limit`             | integer | ❌        | 100     | Number of transfers to return (1 to 100)                                  |
 | `desc`              | boolean | ❌        | false   | Sort descending (newest first) when true                                  |
 | `min_amount`        | string  | ❌        | null    | Minimum absolute amount in token units (e.g. yoctoNEAR)                   |
 | `min_human_amount`  | number  | ❌        | null    | Minimum absolute amount after applying token decimals                     |
@@ -32,7 +52,7 @@ Fetch transfers for an account with default settings (ascending order):
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near"}'
+  -d '{"account_id": "root.near"}'
 ```
 
 #### With Limit and Descending Order
@@ -42,7 +62,7 @@ Fetch the 10 most recent transfers:
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "limit": 10, "desc": true}'
+  -d '{"account_id": "root.near", "limit": 10, "desc": true}'
 ```
 
 #### Pagination with Resume Token
@@ -52,7 +72,7 @@ Continue fetching from where the previous request left off:
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "limit": 10, "desc": true, "resume_token": "7594641293647473196415950063"}'
+  -d '{"account_id": "root.near", "limit": 10, "desc": true, "resume_token": "7628255855001253730542972112"}'
 ```
 
 #### Filter by Time Range
@@ -62,7 +82,7 @@ Fetch transfers within a specific time window (timestamps in milliseconds):
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "from_timestamp_ms": 1768265220000, "to_timestamp_ms": 1768265226000}'
+  -d '{"account_id": "root.near", "from_timestamp_ms": 1776091720000, "to_timestamp_ms": 1776091730000}'
 ```
 
 #### Combined: Resume Token with Time Filter
@@ -73,10 +93,10 @@ Paginate through transfers within a time range:
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "resume_token": "7594641293647473196415950063",
-    "from_timestamp_ms": 1768265200000,
-    "to_timestamp_ms": 1768265300000,
+    "account_id": "root.near",
+    "resume_token": "7628255855001253730542972112",
+    "from_timestamp_ms": 1776091720000,
+    "to_timestamp_ms": 1776091730000,
     "limit": 5,
     "desc": true
   }'
@@ -84,16 +104,16 @@ curl -X POST https://transfers.main.fastnear.com/v0/transfers \
 
 #### Filter by Asset and Direction
 
-Fetch only incoming NEAR transfers with at least 1 NEAR (≥ 10²⁴ yoctoNEAR):
+Fetch only incoming bridged-token transfers with at least 5 units:
 
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "asset_id": "near",
+    "account_id": "root.near",
+    "asset_id": "nep245:intents.near:nep141:aleo-usdcx.omft.near",
     "direction": "receiver",
-    "min_amount": "1000000000000000000000000",
+    "min_amount": "5000000",
     "limit": 10,
     "desc": true
   }'
@@ -101,14 +121,14 @@ curl -X POST https://transfers.main.fastnear.com/v0/transfers \
 
 #### Filter by USD Value, Ignoring System Transfers
 
-Fetch transfers worth at least $100, excluding system transfers:
+Fetch transfers worth at least $1, excluding system transfers:
 
 ```bash
 curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "min_usd_amount": 100,
+    "account_id": "root.near",
+    "min_usd_amount": 1,
     "ignore_system": true,
     "desc": true
   }'

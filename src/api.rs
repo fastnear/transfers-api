@@ -1,11 +1,11 @@
-use crate::*;
 use std::fmt;
 
 use actix_web::{post, ResponseError};
-use actix_web::{web, HttpRequest};
-use serde::Deserialize;
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 
-use serde_json::json;
+use crate::click::MAX_TIMESTAMP;
+use crate::types::{ApiError, TransfersInput, TransfersResponse};
+use crate::AppState;
 
 const TARGET_API: &str = "api";
 const MAX_TRANSFERS_LIMIT: usize = 100;
@@ -41,10 +41,10 @@ impl ResponseError for ServiceError {
             }
             ServiceError::ArgumentError(ref err) => {
                 tracing::error!(target: TARGET_API, "Argument error: {}", err);
-                HttpResponse::BadRequest().json(json!({
-                    "error": "Bad request",
-                    "message": err,
-                }))
+                HttpResponse::BadRequest().json(ApiError {
+                    error: "Bad request".to_string(),
+                    message: err.clone(),
+                })
             }
         }
     }
@@ -52,34 +52,6 @@ impl ResponseError for ServiceError {
 
 pub mod v0 {
     use super::*;
-    use crate::click::MAX_TIMESTAMP;
-    use serde_with::{serde_as, DisplayFromStr};
-
-    #[derive(Debug, Deserialize)]
-    #[serde(rename_all = "snake_case")]
-    pub enum Direction {
-        Sender,
-        Receiver,
-    }
-
-    #[serde_as]
-    #[derive(Debug, Deserialize)]
-    pub struct TransfersInput {
-        pub account_id: AccountId,
-        #[serde_as(as = "Option<DisplayFromStr>")]
-        pub resume_token: Option<u128>,
-        pub from_timestamp_ms: Option<u64>,
-        pub to_timestamp_ms: Option<u64>,
-        pub limit: Option<usize>,
-        pub desc: Option<bool>,
-        #[serde_as(as = "Option<DisplayFromStr>")]
-        pub min_amount: Option<u128>,
-        pub min_human_amount: Option<f64>,
-        pub min_usd_amount: Option<f64>,
-        pub asset_id: Option<String>,
-        pub direction: Option<Direction>,
-        pub ignore_system: Option<bool>,
-    }
 
     #[post("/transfers")]
     pub async fn get_transfers_by_account(
@@ -133,9 +105,9 @@ pub mod v0 {
             input.account_id
         );
 
-        Ok(web::Json(json!({
-            "transfers": transfers,
-            "resume_token": resume_token,
-        })))
+        Ok(web::Json(TransfersResponse {
+            transfers,
+            resume_token,
+        }))
     }
 }

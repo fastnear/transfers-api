@@ -85,6 +85,7 @@
   <div class="endpoint">
     <span class="method">POST</span> https://transfers.main.fastnear.com/v0/transfers
   </div>
+  <p>The public Transfers API currently runs on mainnet only.</p>
 
   <h2>Parameters</h2>
   <table>
@@ -130,8 +131,8 @@
         <td><code>limit</code></td>
         <td>integer</td>
         <td class="optional">No</td>
-        <td>1000</td>
-        <td>Number of transfers to return (1 to 1000)</td>
+        <td>100</td>
+        <td>Number of transfers to return (1 to 100)</td>
       </tr>
       <tr>
         <td><code>desc</code></td>
@@ -191,59 +192,59 @@
   <p>Fetch transfers for an account with default settings (ascending order):</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near"}'</code></pre>
+  -d '{"account_id": "root.near"}'</code></pre>
 
   <h3>With Limit and Descending Order</h3>
   <p>Fetch the 10 most recent transfers:</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "limit": 10, "desc": true}'</code></pre>
+  -d '{"account_id": "root.near", "limit": 10, "desc": true}'</code></pre>
 
   <h3>Pagination with Resume Token</h3>
   <p>Continue fetching from where the previous request left off:</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "limit": 10, "desc": true, "resume_token": "7594641293647473196415950063"}'</code></pre>
+  -d '{"account_id": "root.near", "limit": 10, "desc": true, "resume_token": "7628255855001253730542972112"}'</code></pre>
 
   <h3>Filter by Time Range</h3>
   <p>Fetch transfers within a specific time window (timestamps in milliseconds):</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
-  -d '{"account_id": "intents.near", "from_timestamp_ms": 1768265220000, "to_timestamp_ms": 1768265226000}'</code></pre>
+  -d '{"account_id": "root.near", "from_timestamp_ms": 1776091720000, "to_timestamp_ms": 1776091730000}'</code></pre>
 
   <h3>Combined: Resume Token with Time Filter</h3>
   <p>Paginate through transfers within a time range:</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "resume_token": "7594641293647473196415950063",
-    "from_timestamp_ms": 1768265200000,
-    "to_timestamp_ms": 1768265300000,
+    "account_id": "root.near",
+    "resume_token": "7628255855001253730542972112",
+    "from_timestamp_ms": 1776091720000,
+    "to_timestamp_ms": 1776091730000,
     "limit": 5,
     "desc": true
   }'</code></pre>
 
   <h3>Filter by Asset and Direction</h3>
-  <p>Fetch only incoming NEAR transfers with at least 1 NEAR:</p>
+  <p>Fetch only incoming bridged-token transfers with at least 5 units:</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "asset_id": "near",
+    "account_id": "root.near",
+    "asset_id": "nep245:intents.near:nep141:aleo-usdcx.omft.near",
     "direction": "receiver",
-    "min_amount": "1000000000000000000000000",
+    "min_amount": "5000000",
     "limit": 10,
     "desc": true
   }'</code></pre>
 
   <h3>Filter by USD Value, Ignoring System Transfers</h3>
-  <p>Fetch transfers worth at least $100, excluding system transfers:</p>
+  <p>Fetch transfers worth at least $1, excluding system transfers:</p>
   <pre><code>curl -X POST https://transfers.main.fastnear.com/v0/transfers \
   -H "Content-Type: application/json" \
   -d '{
-    "account_id": "intents.near",
-    "min_usd_amount": 100,
+    "account_id": "root.near",
+    "min_usd_amount": 1,
     "ignore_system": true,
     "desc": true
   }'</code></pre>
