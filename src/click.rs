@@ -1,7 +1,6 @@
 use crate::*;
 
-use clickhouse::{Client, Row};
-use serde::de::DeserializeOwned;
+use clickhouse::{Client, RowOwned, RowRead};
 use std::env;
 
 const CLICKHOUSE_TABLE_NAME: &str = "account_transfers";
@@ -35,7 +34,7 @@ impl ClickDB {
 
     pub async fn read_rows<T>(&self, query: &str) -> clickhouse::error::Result<Vec<T>>
     where
-        T: Row + DeserializeOwned,
+        T: RowOwned + RowRead,
     {
         let rows = self.client.query(query).fetch_all::<T>().await?;
         Ok(rows)
@@ -151,4 +150,5 @@ fn establish_connection() -> Client {
         .with_user(env::var("DATABASE_USER").unwrap())
         .with_password(env::var("DATABASE_PASSWORD").unwrap())
         .with_database(env::var("DATABASE_DATABASE").unwrap())
+        .with_validation(false)
 }

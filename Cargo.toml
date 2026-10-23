@@ -20,7 +20,7 @@ tracing-actix-web = "0.7.9"
 near-primitives = "0.34.2"
 near-crypto = "0.34.2"
 
-clickhouse = { version = "0.13", features = ["native-tls", "lz4", "chrono"] }
+clickhouse = { version = "0.15", features = ["native-tls", "lz4", "chrono"] }
 
 reqwest = { version = "0.12", features = ["json"] }
 base64 = "0.22.1"
